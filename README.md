@@ -19,8 +19,12 @@
         .card-2 { border-top-color: #059669; } .card-3 { border-top-color: #7c3aed; }
         .card-4 { border-top-color: #db2777; }
         
-        /* সিরিয়াল নাম্বার স্টাইল */
-        .sl-badge { font-size: 24px; font-weight: 900; opacity: 0.2; line-height: 1; }
+        /* সিরিয়াল নাম্বার স্টাইল - কালারিং ও গাঢ় */
+        .sl-text-0 { color: #dc2626; } .sl-text-1 { color: #2563eb; }
+        .sl-text-2 { color: #059669; } .sl-text-3 { color: #7c3aed; }
+        .sl-text-4 { color: #db2777; }
+        
+        .sl-badge { font-size: 32px; font-weight: 900; line-height: 1; opacity: 0.8; }
         .text-red-custom { color: #dc2626; }
     </style>
 </head>
@@ -78,7 +82,7 @@
             <p class="text-[10px] text-gray-500 mb-1 px-1">সর্বশেষ রক্তদান (না দিয়ে থাকলে ফাঁকা রাখুন)</p>
             <input type="date" id="regLast" class="w-full p-3 mb-5 border rounded-xl font-bold bg-gray-50">
             <button onclick="handleRegister()" id="rBtn" class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold shadow-lg">রেজিস্ট্রেশন সম্পন্ন করুন</button>
-            <button onclick="location.reload()" class="w-full text-gray-500 mt-4 text-sm font-bold">ফিরে যান</button>
+            <button onclick="location.reload()" class="w-full text-gray-500 mt-4 text-sm font-bold font-black">ফিরে যান</button>
         </div>
     </div>
 
@@ -173,13 +177,12 @@
                 const isMe = (loggedUser.role === 'Member' && String(d.p).slice(-10) === String(loggedUser.p).slice(-10));
                 const isAdmin = (loggedUser.role === 'Admin');
                 
-                // তথ্য অদলবদল সংশোধন করা হয়েছে
                 list.innerHTML += `
                 <div class="bg-white p-5 rounded-[30px] shadow-sm border-t-[6px] card-${cIdx} relative overflow-hidden">
                     <div class="absolute top-0 right-0 bg-red-600 text-white px-4 py-1.5 rounded-bl-2xl font-black text-lg shadow-sm">${d.l}</div>
                     
-                    <div class="flex justify-between items-start mb-2">
-                         <div class="sl-badge text-gray-400">${String(index+1).padStart(2,'0')}</div>
+                    <div class="flex justify-between items-start mb-1">
+                         <div class="sl-badge sl-text-${cIdx}">${String(index+1).padStart(2,'0')}</div>
                     </div>
 
                     <div class="space-y-1">
