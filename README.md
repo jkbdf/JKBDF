@@ -39,7 +39,7 @@
 
     <div id="loginPage" class="container-custom flex flex-col items-center pt-4">
         <div class="bg-white p-6 rounded-[40px] shadow-xl w-full text-center border border-gray-100">
-            <h2 class="text-xl font-bold text-gray-800 mb-6">প্যানেলে প্রবেশ করুন</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-6">লগইন করুন</h2>
             
             <div class="flex justify-center gap-2 mb-6 p-1 bg-gray-100 rounded-2xl">
                 <button onclick="setRole('Member')" id="roleMember" class="flex-1 py-3 rounded-xl text-xs font-bold bg-white text-red-600 shadow-sm">সদস্য</button>
@@ -144,23 +144,17 @@
 
         function calculateStatus(dateStr) {
             if(!dateStr || dateStr == "" || dateStr == "undefined") {
-                return { last: "দয়া করে আপডেট করে নিন", next: "আপডেট প্রয়োজন", can: false };
+                return { last: "দয়া করে আপডেট করে নিন", next: "আপডেট প্রয়োজন" };
             }
             const lastDate = new Date(dateStr);
             if (isNaN(lastDate.getTime())) {
-                return { last: "দয়া করে আপডেট করে নিন", next: "আপডেট প্রয়োজন", can: false };
+                return { last: "দয়া করে আপডেট করে নিন", next: "আপডেট প্রয়োজন" };
             }
-            
             const today = new Date();
-            const diffTime = today - lastDate;
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const diffDays = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
             const formattedDate = lastDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-            
-            if (diffDays >= 90) {
-                return { last: formattedDate, next: "রক্ত দিতে পারবে ✅", can: true };
-            } else {
-                return { last: formattedDate, next: (90 - diffDays) + " দিন বাকী", can: false };
-            }
+            if (diffDays >= 90) return { last: formattedDate, next: "রক্ত দিতে পারবে ✅" };
+            return { last: formattedDate, next: (90 - diffDays) + " দিন বাকী" };
         }
 
         function renderDonors(data) {
@@ -176,16 +170,9 @@
                 list.innerHTML += `
                 <div class="bg-white p-5 rounded-[30px] shadow-sm border-t-[6px] card-${colorIdx} relative overflow-hidden">
                     <div class="absolute top-0 right-0 bg-red-600 text-white px-5 py-2 rounded-bl-[20px] font-black text-xl shadow-md">${d.g}</div>
-                    
                     <div class="mt-2 space-y-1">
-                        <div class="info-row">
-                            <span class="info-label">সিরিয়াল নংঃ</span>
-                            <span class="px-3 py-0.5 rounded-full text-[11px] font-black sl-${colorIdx}">সিরিয়াল নংঃ ${slNo}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">নামঃ</span>
-                            <span class="text-xl font-black text-gray-900 flex-1 leading-tight">${d.n}</span>
-                        </div>
+                        <div class="info-row"><span class="info-label">সিরিয়াল নংঃ</span><span class="px-3 py-0.5 rounded-full text-[11px] font-black sl-${colorIdx}">সিরিয়াল নংঃ ${slNo}</span></div>
+                        <div class="info-row"><span class="info-label">নামঃ</span><span class="text-xl font-black text-gray-900 flex-1 leading-tight">${d.n}</span></div>
                         <div class="info-row"><span class="info-label">ঠিকানাঃ</span><span class="info-value text-gray-600">${d.l}</span></div>
                         <div class="info-row"><span class="info-label">সর্বশেষ রক্তদানঃ</span><span class="info-value text-red-custom">${status.last}</span></div>
                         <div class="info-row"><span class="info-label">পরবর্তী রক্তদানঃ</span><span class="info-value text-red-custom">${status.next}</span></div>
