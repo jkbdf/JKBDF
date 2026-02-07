@@ -34,6 +34,26 @@
             
             <button onclick="handleLogin()" id="lBtn" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-all">লগইন করুন</button>
             <p id="lErr" class="text-red-500 text-[10px] mt-4 font-bold hidden"></p>
+
+            <div class="mt-8 pt-6 border-t border-gray-100">
+                <p class="text-[10px] text-gray-500 font-bold mb-2 uppercase tracking-wide">যেকোনো সমস্যায় যোগাযোগ করুন</p>
+                <h3 class="text-xs font-black text-gray-800">প্রতিষ্ঠাতা পরিচালকঃ মোঃ মেহেদী হাসান</h3>
+                
+                <div class="grid grid-cols-1 gap-2 mt-4">
+                    <a href="tel:01888354739" class="flex items-center justify-center gap-2 bg-blue-50 text-blue-700 py-2 rounded-xl font-bold text-sm border border-blue-100">
+                        📞 01888354739
+                    </a>
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <a href="https://wa.me/8801888354739" target="_blank" class="flex items-center justify-center gap-2 bg-green-50 text-green-700 py-2 rounded-xl text-[11px] font-bold border border-green-100">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="w-4 h-4"> হোয়াটসঅ্যাপ
+                        </a>
+                        <a href="https://www.facebook.com/Mehedi.1316" target="_blank" class="flex items-center justify-center gap-2 bg-indigo-50 text-indigo-700 py-2 rounded-xl text-[11px] font-bold border border-indigo-100">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" class="w-4 h-4"> ফেসবুক
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -156,7 +176,7 @@
                             </div>
                             <div class="status-box ${status.color} border border-opacity-30 text-center">
                                 <p class="text-[9px] font-bold opacity-60 uppercase mb-1 tracking-wider">রক্তদানের স্ট্যাটাস</p>
-                                <p class="text-[13px] font-black leading-tight ${status.textColor}">
+                                <p class="text-[12px] font-black leading-tight ${status.textColor}">
                                     ${status.txt}
                                 </p>
                             </div>
@@ -186,47 +206,21 @@
         }
 
         function calculateStatus(dateStr) {
-            // যদি তারিখ আপডেট করা না থাকে
             if(!dateStr || dateStr === "তারিখ নেই" || dateStr === "undefined" || dateStr === "") {
-                return { 
-                    txt: "দয়া করে তারিখ আপডেট করুন", 
-                    can: false, 
-                    color: "bg-orange-100 border-orange-200",
-                    textColor: "text-orange-700" 
-                };
+                return { txt: "দয়া করে তারিখ আপডেট করুন", can: false, color: "bg-orange-100 border-orange-200", textColor: "text-orange-700" };
             }
-
             const last = new Date(dateStr);
             const today = new Date();
-            
-            // অবৈধ তারিখ চেক
             if (isNaN(last.getTime())) {
-                return { 
-                    txt: "দয়া করে তারিখ আপডেট করুন", 
-                    can: false, 
-                    color: "bg-orange-100 border-orange-200",
-                    textColor: "text-orange-700" 
-                };
+                return { txt: "দয়া করে তারিখ আপডেট করুন", can: false, color: "bg-orange-100 border-orange-200", textColor: "text-orange-700" };
             }
-
             const diffTime = Math.abs(today - last);
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            
             if (diffDays >= 90) {
-                return { 
-                    txt: "রক্ত দিতে পারবে ✅", 
-                    can: true, 
-                    color: "bg-green-100 border-green-200",
-                    textColor: "text-green-700"
-                };
+                return { txt: "রক্ত দিতে পারবে ✅", can: true, color: "bg-green-100 border-green-200", textColor: "text-green-700" };
             } else {
                 const remaining = 90 - diffDays;
-                return { 
-                    txt: remaining + " দিন পর রক্ত দিতে পারবে", 
-                    can: false, 
-                    color: "bg-red-50 border-red-100",
-                    textColor: "text-red-600"
-                };
+                return { txt: remaining + " দিন পর রক্ত দিতে পারবে", can: false, color: "bg-red-50 border-red-100", textColor: "text-red-600" };
             }
         }
     </script>
