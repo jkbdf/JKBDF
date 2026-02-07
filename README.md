@@ -9,6 +9,7 @@
     <style>
         body { font-family: 'Hind Siliguri', sans-serif; background-color: #f1f5f9; }
         .hero-gradient { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); }
+        .status-box { border-radius: 20px; padding: 12px; transition: all 0.3s; }
     </style>
 </head>
 <body class="pb-20">
@@ -49,9 +50,9 @@
 
         <div id="editModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-6 z-50">
             <div class="bg-white p-6 rounded-[35px] w-full max-w-sm shadow-2xl">
-                <h3 id="editingName" class="font-bold text-gray-800"></h3>
-                <p class="text-[10px] text-gray-400 mb-4 font-bold uppercase">রক্তদানের তারিখ আপডেট</p>
-                <input type="date" id="newDate" class="w-full p-4 border rounded-2xl mb-4 bg-gray-50 outline-none font-bold">
+                <h3 id="editingName" class="font-bold text-gray-800 text-lg"></h3>
+                <p class="text-[10px] text-gray-400 mb-4 font-bold uppercase tracking-widest">রক্তদানের তারিখ আপডেট</p>
+                <input type="date" id="newDate" class="w-full p-4 border rounded-2xl mb-4 bg-gray-50 outline-none font-bold text-center">
                 <div class="flex gap-2">
                     <button onclick="closeEdit()" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold text-xs">বাতিল</button>
                     <button onclick="submitUpdate()" id="sBtn" class="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold text-xs">সেভ করুন</button>
@@ -61,14 +62,13 @@
 
         <div class="px-8 mb-4 flex items-center justify-between">
             <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest">রক্তদাতাদের তালিকা</h3>
-            <span id="adminBadge" class="hidden bg-black text-white text-[8px] px-2 py-0.5 rounded font-bold uppercase">Admin Mode</span>
+            <span id="adminBadge" class="hidden bg-black text-white text-[8px] px-2 py-0.5 rounded font-bold uppercase tracking-widest">Admin Access</span>
         </div>
 
-        <div id="donorList" class="px-6 grid gap-5"></div>
+        <div id="donorList" class="px-6 grid gap-6"></div>
     </div>
 
     <script>
-        // আপনার নতুন URL এখানে বসানো হয়েছে
         const scriptURL = "https://script.google.com/macros/s/AKfycbx2AUrExnRv7h2cMRlBv6nqpf3oNy5s9Bh0iKzGG3-5YhGC1NGDEWN7lsRmuaEHo92o/exec"; 
         
         let allDonors = [];
@@ -78,19 +78,14 @@
 
         function setRole(role) {
             currentRole = role;
-            const mFields = document.getElementById('memberFields');
-            const aFields = document.getElementById('adminFields');
-            const mBtn = document.getElementById('roleMember');
-            const aBtn = document.getElementById('roleAdmin');
-
+            const mFields = document.getElementById('memberFields'), aFields = document.getElementById('adminFields');
+            const mBtn = document.getElementById('roleMember'), aBtn = document.getElementById('roleAdmin');
             if(role === 'Admin') {
-                aFields.classList.remove('hidden');
-                mFields.classList.add('hidden');
+                aFields.classList.remove('hidden'); mFields.classList.add('hidden');
                 aBtn.className = "flex-1 py-3 rounded-xl text-xs font-bold bg-white text-red-600 shadow-sm";
                 mBtn.className = "flex-1 py-3 rounded-xl text-xs font-bold text-gray-500";
             } else {
-                aFields.classList.add('hidden');
-                mFields.classList.remove('hidden');
+                aFields.classList.add('hidden'); mFields.classList.remove('hidden');
                 mBtn.className = "flex-1 py-3 rounded-xl text-xs font-bold bg-white text-red-600 shadow-sm";
                 aBtn.className = "flex-1 py-3 rounded-xl text-xs font-bold text-gray-500";
             }
@@ -100,37 +95,22 @@
             const phone = document.getElementById('uPhone').value.trim();
             const pass = document.getElementById('uPass').value.trim();
             const err = document.getElementById('lErr');
-            const btn = document.getElementById('lBtn');
-            
-            err.innerText = "⏳ ডাটা যাচাই হচ্ছে...";
-            err.classList.remove('hidden');
-            btn.disabled = true;
+            err.innerText = "⏳ ডাটা যাচাই হচ্ছে..."; err.classList.remove('hidden');
 
             try {
                 const res = await fetch(scriptURL);
                 allDonors = await res.json();
-
                 if(currentRole === 'Admin') {
                     if(pass === 'Mehedi4739') {
-                        loggedUser = { n: "অ্যাডমিন প্যানেল", role: "Admin" };
-                        showMain();
-                    } else {
-                        err.innerText = "❌ ভুল এডমিন পাসওয়ার্ড!";
-                    }
+                        loggedUser = { n: "অ্যাডমিন প্যানেল", role: "Admin" }; showMain();
+                    } else { err.innerText = "❌ ভুল এডমিন পাসওয়ার্ড!"; }
                 } else {
                     const member = allDonors.find(d => String(d.p).slice(-10) === phone.slice(-10));
                     if(member) {
-                        loggedUser = { ...member, role: "Member" };
-                        showMain();
-                    } else { 
-                        err.innerText = "❌ এই নম্বরটি তালিকায় নেই!"; 
-                    }
+                        loggedUser = { ...member, role: "Member" }; showMain();
+                    } else { err.innerText = "❌ এই নম্বরটি তালিকায় নেই!"; }
                 }
-            } catch (e) { 
-                err.innerText = "❌ কানেকশন এরর!"; 
-            } finally {
-                btn.disabled = false;
-            }
+            } catch (e) { err.innerText = "❌ কানেকশন এরর!"; }
         }
 
         function showMain() {
@@ -158,20 +138,28 @@
                 const status = calculateStatus(d.last);
                 
                 list.innerHTML += `
-                <div class="bg-white p-5 rounded-[30px] shadow-sm border-2 ${isMe ? 'border-green-400 bg-green-50/20' : 'border-white'} relative">
-                    <span class="absolute -top-3 left-6 bg-gray-800 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">SL: ${d.sl || (index+1)}</span>
-                    <div class="flex flex-col gap-3 mt-2">
+                <div class="bg-white p-6 rounded-[35px] shadow-md border-2 ${isMe ? 'border-green-400 bg-green-50/20' : 'border-white'} relative">
+                    <span class="absolute -top-1 left-8 bg-gray-800 text-white text-[10px] px-3 py-1 rounded-b-lg font-bold">SL: ${d.sl || (index+1)}</span>
+                    <div class="flex flex-col gap-4 mt-4">
                         <div class="flex items-center gap-4">
-                            <div class="bg-red-600 text-white min-w-[50px] h-[50px] rounded-[18px] flex items-center justify-center font-black text-xl shadow-lg">${d.g}</div>
+                            <div class="bg-red-600 text-white min-w-[60px] h-[60px] rounded-[22px] flex items-center justify-center font-black text-2xl shadow-lg">${d.g}</div>
                             <div class="flex-1">
-                                <h4 class="font-bold text-gray-800 text-sm leading-tight">${d.n}</h4>
-                                <p class="text-[10px] text-red-600 font-bold mt-1 tracking-wide">📍 ঠিকানা: ${d.l}</p>
+                                <h4 class="font-bold text-gray-800 text-lg leading-tight">${d.n}</h4>
+                                <p class="text-sm text-red-600 font-bold mt-1 tracking-wide">📍 ঠিকানা: ${d.l}</p>
                             </div>
-                            ${(isMe || isAdmin) ? `<button onclick="openEdit('${d.p}', '${d.n}')" class="bg-blue-50 px-3 py-1 rounded-xl text-blue-600 shadow-sm border border-blue-100 font-bold text-xs">এডিট</button>` : ''}
+                            ${(isMe || isAdmin) ? `<button onclick="openEdit('${d.p}', '${d.n}')" class="bg-blue-600 px-4 py-2 rounded-xl text-white shadow-md font-bold text-xs active:scale-95 transition-all">এডিট</button>` : ''}
                         </div>
-                        <div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl border border-gray-100">
-                            <p class="text-xs font-black ${status.can ? 'text-green-600' : 'text-red-500'}">${status.txt}</p>
-                            <p class="text-[9px] font-bold text-gray-400 italic">শেষ: ${d.last}</p>
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <div class="status-box bg-gray-50 border border-gray-100 text-center">
+                                <p class="text-[9px] font-bold text-gray-400 uppercase mb-1 tracking-wider">সর্বশেষ রক্তদান</p>
+                                <p class="text-sm font-black text-gray-700">${(d.last && d.last !== "undefined") ? d.last : "তারিখ নেই"}</p>
+                            </div>
+                            <div class="status-box ${status.color} border border-opacity-30 text-center">
+                                <p class="text-[9px] font-bold opacity-60 uppercase mb-1 tracking-wider">রক্তদানের স্ট্যাটাস</p>
+                                <p class="text-[13px] font-black leading-tight ${status.textColor}">
+                                    ${status.txt}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>`;
@@ -188,20 +176,58 @@
 
         async function submitUpdate() {
             const date = document.getElementById('newDate').value;
-            const btn = document.getElementById('sBtn');
-            if(!date) return alert("তারিখ দিন!");
-            btn.disabled = true; btn.innerText = "সেভ হচ্ছে...";
+            if(!date) return alert("দয়া করে তারিখ সিলেক্ট করুন!");
+            document.getElementById('sBtn').disabled = true;
+            document.getElementById('sBtn').innerText = "সেভ হচ্ছে...";
             try {
                 await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ phone: targetPhone, newDate: date }) });
-                alert("সফলভাবে আপডেট হয়েছে!"); location.reload();
-            } catch (e) { alert("ব্যর্থ হয়েছে!"); btn.disabled = false; btn.innerText = "সেভ করুন"; }
+                alert("আপনার তথ্য সফলভাবে আপডেট করা হয়েছে!"); location.reload();
+            } catch (e) { alert("দুঃখিত, আপডেট ব্যর্থ হয়েছে!"); document.getElementById('sBtn').disabled = false; }
         }
 
         function calculateStatus(dateStr) {
-            if(!dateStr || dateStr === "তারিখ নেই") return { txt: "রক্ত দিতে পারবে ✅", can: true };
+            // যদি তারিখ আপডেট করা না থাকে
+            if(!dateStr || dateStr === "তারিখ নেই" || dateStr === "undefined" || dateStr === "") {
+                return { 
+                    txt: "দয়া করে তারিখ আপডেট করুন", 
+                    can: false, 
+                    color: "bg-orange-100 border-orange-200",
+                    textColor: "text-orange-700" 
+                };
+            }
+
             const last = new Date(dateStr);
-            const diff = Math.floor((new Date() - last) / (1000*60*60*24));
-            return diff >= 90 ? { txt: "রক্ত দিতে পারবে ✅", can: true } : { txt: (90-diff) + " দিন বাকি ⏳", can: false };
+            const today = new Date();
+            
+            // অবৈধ তারিখ চেক
+            if (isNaN(last.getTime())) {
+                return { 
+                    txt: "দয়া করে তারিখ আপডেট করুন", 
+                    can: false, 
+                    color: "bg-orange-100 border-orange-200",
+                    textColor: "text-orange-700" 
+                };
+            }
+
+            const diffTime = Math.abs(today - last);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays >= 90) {
+                return { 
+                    txt: "রক্ত দিতে পারবে ✅", 
+                    can: true, 
+                    color: "bg-green-100 border-green-200",
+                    textColor: "text-green-700"
+                };
+            } else {
+                const remaining = 90 - diffDays;
+                return { 
+                    txt: remaining + " দিন পর রক্ত দিতে পারবে", 
+                    can: false, 
+                    color: "bg-red-50 border-red-100",
+                    textColor: "text-red-600"
+                };
+            }
         }
     </script>
 </body>
