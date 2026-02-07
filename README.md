@@ -68,6 +68,7 @@
     </div>
 
     <script>
+        // আপনার নতুন URL এখানে বসানো হয়েছে
         const scriptURL = "https://script.google.com/macros/s/AKfycbx2AUrExnRv7h2cMRlBv6nqpf3oNy5s9Bh0iKzGG3-5YhGC1NGDEWN7lsRmuaEHo92o/exec"; 
         
         let allDonors = [];
@@ -99,37 +100,36 @@
             const phone = document.getElementById('uPhone').value.trim();
             const pass = document.getElementById('uPass').value.trim();
             const err = document.getElementById('lErr');
+            const btn = document.getElementById('lBtn');
             
             err.innerText = "⏳ ডাটা যাচাই হচ্ছে...";
             err.classList.remove('hidden');
+            btn.disabled = true;
 
             try {
-                // এডমিন লগইন
+                const res = await fetch(scriptURL);
+                allDonors = await res.json();
+
                 if(currentRole === 'Admin') {
                     if(pass === 'Mehedi4739') {
-                        const res = await fetch(scriptURL);
-                        allDonors = await res.json();
                         loggedUser = { n: "অ্যাডমিন প্যানেল", role: "Admin" };
                         showMain();
                     } else {
                         err.innerText = "❌ ভুল এডমিন পাসওয়ার্ড!";
                     }
-                    return;
-                }
-
-                // সদস্য লগইন
-                const res = await fetch(scriptURL);
-                allDonors = await res.json();
-                const member = allDonors.find(d => String(d.p).slice(-10) === phone.slice(-10));
-                
-                if(member) {
-                    loggedUser = { ...member, role: "Member" };
-                    showMain();
-                } else { 
-                    err.innerText = "❌ এই নম্বরটি তালিকায় নেই!"; 
+                } else {
+                    const member = allDonors.find(d => String(d.p).slice(-10) === phone.slice(-10));
+                    if(member) {
+                        loggedUser = { ...member, role: "Member" };
+                        showMain();
+                    } else { 
+                        err.innerText = "❌ এই নম্বরটি তালিকায় নেই!"; 
+                    }
                 }
             } catch (e) { 
                 err.innerText = "❌ কানেকশন এরর!"; 
+            } finally {
+                btn.disabled = false;
             }
         }
 
@@ -165,7 +165,7 @@
                             <div class="bg-red-600 text-white min-w-[50px] h-[50px] rounded-[18px] flex items-center justify-center font-black text-xl shadow-lg">${d.g}</div>
                             <div class="flex-1">
                                 <h4 class="font-bold text-gray-800 text-sm leading-tight">${d.n}</h4>
-                                <p class="text-[10px] text-red-600 font-bold mt-1">📍 ${d.l}</p>
+                                <p class="text-[10px] text-red-600 font-bold mt-1 tracking-wide">📍 ঠিকানা: ${d.l}</p>
                             </div>
                             ${(isMe || isAdmin) ? `<button onclick="openEdit('${d.p}', '${d.n}')" class="bg-blue-50 px-3 py-1 rounded-xl text-blue-600 shadow-sm border border-blue-100 font-bold text-xs">এডিট</button>` : ''}
                         </div>
