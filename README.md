@@ -16,7 +16,7 @@
     <div class="hero-gradient text-white pb-12 pt-8 px-4 rounded-b-[50px] shadow-2xl text-center">
         <div class="flex justify-center mb-5">
             <div class="bg-white p-1 rounded-full shadow-2xl border-4 border-red-500/20">
-                <img src="https://i.ibb.co/C3m2X9Y/1000001730.png" alt="Logo" class="w-24 h-24 md:w-28 md:h-28 rounded-full object-contain">
+                <img src="logo.png" onerror="this.src='https://i.ibb.co/C3m2X9Y/1000001730.png'" alt="Logo" class="w-24 h-24 md:w-28 md:h-28 rounded-full object-contain">
             </div>
         </div>
         <h1 class="text-2xl md:text-4xl font-bold uppercase tracking-tight mb-1">যুব কল্যাণ রক্তদান ফাউন্ডেশন</h1>
@@ -96,10 +96,14 @@
         function displayDonors(data) {
             const list = document.getElementById('donorList');
             list.innerHTML = "";
-            data.forEach(d => {
+            data.forEach((d, index) => {
                 const status = getStatus(d.last);
                 list.innerHTML += `
-                <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 p-7 hover:shadow-xl transition-all">
+                <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 p-7 hover:shadow-xl transition-all relative">
+                    <div class="absolute top-4 left-4 bg-gray-200 text-gray-600 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border border-white">
+                        ${index + 1}
+                    </div>
+                    
                     <div class="flex justify-between items-center mb-5">
                         <div class="bg-red-600 text-white w-16 h-16 rounded-[22px] flex items-center justify-center font-black text-2xl shadow-lg">${d.g}</div>
                         <div class="text-right">
@@ -135,4 +139,3 @@
     </script>
 </body>
 </html>
-
