@@ -9,6 +9,7 @@
     <style>
         body { font-family: 'Hind Siliguri', sans-serif; background-color: #f1f5f9; }
         .hero-gradient { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); }
+        .handwritten-box { border: 1px dashed #cbd5e1; background-color: #fff; }
     </style>
 </head>
 <body class="pb-20">
@@ -64,7 +65,8 @@
                     l: d.l || d.Location || d.address || "ঠিকানা নেই",
                     g: d.g || d.Group || d["Blood Group"] || "N/A",
                     p: d.p || d.Phone || d.Contact || "",
-                    last: d.last || d.LastDate || d["Last Donation"] || ""
+                    last: d.last || d.LastDate || d["Last Donation"] || "",
+                    note: d.note || d.Comments || d["মন্তব্য"] || ""
                 }));
 
                 if (allDonors.length > 0) {
@@ -81,10 +83,10 @@
 
         function getStatus(lastDateStr) {
             if (!lastDateStr || lastDateStr.trim() === "" || lastDateStr === "undefined" || lastDateStr === "N/A") {
-                return { text: "রক্ত দিতে পারবে", class: "text-green-600 bg-green-50 border-green-200", last: "তারিখ নেই" };
+                return { text: "রক্ত দিতে পারবে", class: "text-green-600 bg-green-50 border-green-200", last: "এখনও রক্ত দেয়নি" };
             }
             const lastDate = new Date(lastDateStr);
-            if (isNaN(lastDate)) return { text: "রক্ত দিতে পারবে", class: "text-green-600 bg-green-50 border-green-200", last: "তারিখ নেই" };
+            if (isNaN(lastDate)) return { text: "রক্ত দিতে পারবে", class: "text-green-600 bg-green-50 border-green-200", last: lastDateStr };
             
             const diffDays = Math.floor((new Date() - lastDate) / (1000 * 60 * 60 * 24));
             const formatted = lastDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -99,28 +101,32 @@
             data.forEach((d, index) => {
                 const status = getStatus(d.last);
                 list.innerHTML += `
-                <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 p-7 hover:shadow-xl transition-all relative">
-                    <div class="absolute top-4 left-4 bg-gray-200 text-gray-600 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border border-white">
+                <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 p-7 hover:shadow-xl transition-all relative overflow-hidden">
+                    <div class="absolute top-4 left-4 bg-gray-100 text-gray-500 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold border border-white shadow-sm">
                         ${index + 1}
                     </div>
                     
                     <div class="flex justify-between items-center mb-5">
-                        <div class="bg-red-600 text-white w-16 h-16 rounded-[22px] flex items-center justify-center font-black text-2xl shadow-lg">${d.g}</div>
+                        <div class="bg-red-600 text-white w-16 h-16 rounded-[22px] flex items-center justify-center font-black text-2xl shadow-lg ring-4 ring-red-50">${d.g}</div>
                         <div class="text-right">
                             <h3 class="font-bold text-xl text-gray-800">${d.n}</h3>
                             <p class="text-sm text-gray-500 font-semibold">📍 ${d.l}</p>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4 mb-6 text-center">
-                        <div class="bg-gray-50 p-3 rounded-2xl shadow-sm border border-gray-100">
-                            <p class="text-[9px] uppercase font-black text-gray-400 tracking-wider">শেষ রক্তদান</p>
-                            <p class="text-[11px] font-bold text-gray-700">${status.last}</p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4 text-center">
+                        <div class="handwritten-box p-3 rounded-2xl shadow-inner">
+                            <p class="text-[9px] uppercase font-black text-blue-500 tracking-wider">রক্তদানের তারিখ</p>
+                            <p class="text-[11px] font-bold text-gray-700 mt-1 underline decoration-dotted">${status.last}</p>
                         </div>
                         <div class="${status.class} p-3 rounded-2xl shadow-sm border">
-                            <p class="text-[9px] uppercase font-black opacity-60 tracking-wider">অবস্থা</p>
-                            <p class="text-[11px] font-bold">${status.text}</p>
+                            <p class="text-[9px] uppercase font-black opacity-60 tracking-wider">বর্তমান অবস্থা</p>
+                            <p class="text-[11px] font-bold mt-1">${status.text}</p>
                         </div>
                     </div>
+
+                    ${d.note ? `<div class="bg-yellow-50 p-2 rounded-xl mb-4 border border-yellow-100 text-[10px] text-gray-600 italic text-center">"${d.note}"</div>` : ''}
+
                     <a href="tel:${d.p}" class="flex items-center justify-center gap-2 w-full bg-red-600 text-white py-4 rounded-[20px] font-black text-sm shadow-xl active:scale-95 transition-all">📞 কল দিন</a>
                 </div>`;
             });
