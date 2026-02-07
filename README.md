@@ -14,15 +14,13 @@
         .info-label { font-weight: 800; color: #4b5563; min-width: 115px; font-size: 14px; }
         .info-value { font-weight: 700; font-size: 14px; flex: 1; }
         
+        /* কার্ড বর্ডার কালার */
         .card-0 { border-top-color: #dc2626; } .card-1 { border-top-color: #2563eb; }
         .card-2 { border-top-color: #059669; } .card-3 { border-top-color: #7c3aed; }
         .card-4 { border-top-color: #db2777; }
         
-        .sl-0 { background-color: #fee2e2; color: #dc2626; }
-        .sl-1 { background-color: #dbeafe; color: #2563eb; }
-        .sl-2 { background-color: #d1fae5; color: #059669; }
-        .sl-3 { background-color: #f3e8ff; color: #7c3aed; }
-        .sl-4 { background-color: #fce7f3; color: #db2777; }
+        /* সিরিয়াল নাম্বার স্টাইল */
+        .sl-badge { font-size: 24px; font-weight: 900; opacity: 0.2; line-height: 1; }
         .text-red-custom { color: #dc2626; }
     </style>
 </head>
@@ -46,7 +44,7 @@
             <div id="adminFields" class="hidden">
                 <input type="password" id="uPass" placeholder="এডমিন পাসওয়ার্ড" class="w-full p-4 mb-4 border rounded-2xl text-center font-bold outline-none focus:border-red-500 bg-gray-50">
             </div>
-            <button onclick="handleLogin()" id="lBtn" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold">লগইন করুন</button>
+            <button onclick="handleLogin()" id="lBtn" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold shadow-lg">লগইন করুন</button>
             <p id="lErr" class="text-red-500 text-xs mt-3 hidden font-bold"></p>
             
             <div class="mt-8 pt-6 border-t-2 border-dashed border-gray-100">
@@ -77,7 +75,7 @@
             </select>
             <input type="text" id="regLoc" placeholder="ঠিকানা (গ্রাম, উপজেলা, জেলা)" class="w-full p-3 mb-3 border rounded-xl font-bold bg-gray-50">
             <input type="tel" id="regPhone" placeholder="মোবাইল নম্বর" class="w-full p-3 mb-3 border rounded-xl font-bold bg-gray-50">
-            <p class="text-[10px] text-gray-500 mb-1">সর্বশেষ রক্তদান (ঐচ্ছিক)</p>
+            <p class="text-[10px] text-gray-500 mb-1 px-1">সর্বশেষ রক্তদান (না দিয়ে থাকলে ফাঁকা রাখুন)</p>
             <input type="date" id="regLast" class="w-full p-3 mb-5 border rounded-xl font-bold bg-gray-50">
             <button onclick="handleRegister()" id="rBtn" class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold shadow-lg">রেজিস্ট্রেশন সম্পন্ন করুন</button>
             <button onclick="location.reload()" class="w-full text-gray-500 mt-4 text-sm font-bold">ফিরে যান</button>
@@ -175,23 +173,28 @@
                 const isMe = (loggedUser.role === 'Member' && String(d.p).slice(-10) === String(loggedUser.p).slice(-10));
                 const isAdmin = (loggedUser.role === 'Admin');
                 
-                // এখানে ম্যাপিং ফিক্স করা হয়েছে: d.g = রক্তের গ্রুপ, d.l = ঠিকানা
+                // তথ্য অদলবদল সংশোধন করা হয়েছে
                 list.innerHTML += `
                 <div class="bg-white p-5 rounded-[30px] shadow-sm border-t-[6px] card-${cIdx} relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-red-600 text-white px-4 py-1.5 rounded-bl-2xl font-black text-lg shadow-sm">${d.g}</div>
-                    <div class="mt-2 space-y-1">
-                        <div class="info-row">
-                            <span class="info-label text-xs">সিরিয়াল নংঃ</span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black sl-${cIdx}">${String(index+1).padStart(2,'0')}</span>
-                        </div>
+                    <div class="absolute top-0 right-0 bg-red-600 text-white px-4 py-1.5 rounded-bl-2xl font-black text-lg shadow-sm">${d.l}</div>
+                    
+                    <div class="flex justify-between items-start mb-2">
+                         <div class="sl-badge text-gray-400">${String(index+1).padStart(2,'0')}</div>
+                    </div>
+
+                    <div class="space-y-1">
                         <div class="info-row"><span class="info-label">নামঃ</span><span class="text-xl font-black text-gray-900 leading-tight">${d.n}</span></div>
-                        <div class="info-row"><span class="info-label text-xs">ঠিকানাঃ</span><span class="info-value text-gray-500">${d.l}</span></div>
+                        <div class="info-row"><span class="info-label text-xs">ঠিকানাঃ</span><span class="info-value text-gray-500 font-bold">${d.g}</span></div>
                         <div class="info-row"><span class="info-label text-xs">সর্বশেষ রক্তদানঃ</span><span class="info-value text-red-custom">${s.last}</span></div>
                         <div class="info-row"><span class="info-label text-xs">পরবর্তী রক্তদানঃ</span><span class="info-value text-red-custom font-black">${s.next}</span></div>
+                        
                         <div class="info-row border-none pt-3">
                             <span class="info-label text-xs">মোবাইলঃ</span>
-                            <div class="info-value flex items-center gap-3"><span class="text-blue-600 font-bold">${d.p}</span>
-                                <a href="tel:${d.p}" class="bg-green-500 text-white p-2 rounded-full shadow-md active:scale-75 transition-transform"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg></a>
+                            <div class="info-value flex items-center gap-3">
+                                <span class="text-blue-600 font-bold text-base">${d.p}</span>
+                                <a href="tel:${d.p}" class="bg-green-500 text-white p-2.5 rounded-full shadow-md active:scale-75 transition-transform">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                                </a>
                             </div>
                         </div>
                     </div>
