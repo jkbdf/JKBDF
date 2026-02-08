@@ -126,7 +126,6 @@
         const scriptURL = "https://script.google.com/macros/s/AKfycbwaIFFoE5Kzs9BoJa6JOADxdDtM-k62CgFD2phNOhQ6vat0d3a7s5w_TiXHMmfia2B3/exec"; 
         let allDonors = [], loggedUser = null, currentRole = 'Member', targetPhone = "";
 
-        // শো রেজিস্ট্রেশন ফাংশন ঠিক করা হয়েছে
         function showReg() { 
             document.getElementById('loginPage').classList.add('hidden'); 
             document.getElementById('regPage').classList.remove('hidden'); 
@@ -153,28 +152,48 @@
 
         async function handleRegister() {
             const n = document.getElementById('regName').value;
-            const g = document.getElementById('regGroup').value; // ব্লাড গ্রুপ
-            const l = document.getElementById('regLoc').value;   // ঠিকানা
-            const p = document.getElementById('regPhone').value;
+            const g = document.getElementById('regGroup').value;
+            const l = document.getElementById('regLoc').value;
+            const p = document.getElementById('regPhone').value.trim();
             const last = document.getElementById('regLast').value;
 
             if(!n || !g || !l || !p) return alert("সব তথ্য দিন!");
-            document.getElementById('rBtn').innerText = "⏳ প্রসেসিং...";
             
+            document.getElementById('rBtn').innerText = "⏳ তথ্য যাচাই হচ্ছে...";
+            document.getElementById('rBtn').disabled = true;
+
             try {
+                const res = await fetch(scriptURL);
+                const data = await res.json();
+                
+                const exists = data.find(d => String(d.p).slice(-10) === p.slice(-10));
+                
+                if(exists) {
+                    // নতুন মেসেজটি এখানে যুক্ত করা হয়েছে
+                    alert("রেজিস্ট্রেশন করা আছে আপনি সরাসরি লগইন করুন");
+                    location.reload(); 
+                    return;
+                }
+
+                document.getElementById('rBtn').innerText = "⏳ রেজিস্ট্রেশন হচ্ছে...";
                 await fetch(scriptURL, { 
                     method: 'POST', 
                     body: JSON.stringify({ 
                         action: "register", 
                         n: n, 
-                        g: l,      // শিটের 'g' কলামে ঠিকানা
-                        l: g,      // শিটের 'l' কলামে ব্লাড গ্রুপ
+                        g: l, 
+                        l: g, 
                         p: p, 
                         last: last 
                     }) 
                 });
-                alert("রেজিস্ট্রেশন সফল!"); location.reload();
-            } catch (e) { alert("ব্যর্থ!"); document.getElementById('rBtn').innerText = "আবার চেষ্টা করুন"; }
+                alert("রেজিস্ট্রেশন সফল!"); 
+                location.reload();
+            } catch (e) { 
+                alert("ব্যর্থ! আবার চেষ্টা করুন।"); 
+                document.getElementById('rBtn').innerText = "রেজিস্ট্রেশন সম্পন্ন করুন";
+                document.getElementById('rBtn').disabled = false;
+            }
         }
 
         function showMain() {
