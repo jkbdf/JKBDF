@@ -102,7 +102,7 @@
             <button onclick="location.reload()" class="absolute top-4 right-4 text-[11px] bg-white/20 px-3 py-1 rounded-full border border-white/30 font-bold">লগ আউট</button>
             <div class="mt-2">
                 <h2 id="welcome" class="text-2xl font-black text-yellow-300"></h2>
-                <p class="text-xs mt-1 text-white/80 font-bold tracking-widest">যুব কল্যাণ রক্তদান ফাউন্ডেশন</p>
+                <p class="text-xs mt-1 text-white/80 font-bold tracking-widest uppercase">যুব কল্যাণ রক্তদান ফাউন্ডেশন</p>
             </div>
         </div>
         <div class="container-custom mb-4">
@@ -126,6 +126,128 @@
         const scriptURL = "https://script.google.com/macros/s/AKfycbwaIFFoE5Kzs9BoJa6JOADxdDtM-k62CgFD2phNOhQ6vat0d3a7s5w_TiXHMmfia2B3/exec"; 
         let allDonors = [], loggedUser = null, currentRole = 'Member', targetPhone = "";
 
-        function showReg() { document.getElementById('loginPage').classList.add('hidden'); document.getElementById('regPage').classList.remove('hidden'); }
-        function setRole(r) { currentRole = r; document
-        
+        // শো রেজিস্ট্রেশন ফাংশন ঠিক করা হয়েছে
+        function showReg() { 
+            document.getElementById('loginPage').classList.add('hidden'); 
+            document.getElementById('regPage').classList.remove('hidden'); 
+            window.scrollTo(0,0);
+        }
+
+        function setRole(r) { currentRole = r; document.getElementById('memberFields').classList.toggle('hidden', r==='Admin'); document.getElementById('adminFields').classList.toggle('hidden', r==='Member'); document.getElementById('roleMember').classList.toggle('bg-white', r==='Member'); document.getElementById('roleAdmin').classList.toggle('bg-white', r==='Admin'); }
+
+        async function handleLogin() {
+            const phone = document.getElementById('uPhone').value.trim();
+            const pass = document.getElementById('uPass').value.trim();
+            const err = document.getElementById('lErr');
+            err.innerText = "⏳ ডাটা যাচাই হচ্ছে..."; err.classList.remove('hidden');
+            try {
+                const res = await fetch(scriptURL); allDonors = await res.json();
+                if(currentRole === 'Admin' && pass === 'Mehedi4739') { loggedUser = { n: "এডমিন", role: "Admin" }; showMain(); }
+                else {
+                    const user = allDonors.find(d => String(d.p).slice(-10) === phone.slice(-10));
+                    if(user) { loggedUser = { ...user, role: "Member" }; showMain(); }
+                    else { err.innerText = "❌ মেম্বার পাওয়া যায়নি!"; }
+                }
+            } catch (e) { err.innerText = "❌ সার্ভার এরর!"; }
+        }
+
+        async function handleRegister() {
+            const n = document.getElementById('regName').value;
+            const g = document.getElementById('regGroup').value; // ব্লাড গ্রুপ
+            const l = document.getElementById('regLoc').value;   // ঠিকানা
+            const p = document.getElementById('regPhone').value;
+            const last = document.getElementById('regLast').value;
+
+            if(!n || !g || !l || !p) return alert("সব তথ্য দিন!");
+            document.getElementById('rBtn').innerText = "⏳ প্রসেসিং...";
+            
+            try {
+                await fetch(scriptURL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ 
+                        action: "register", 
+                        n: n, 
+                        g: l,      // শিটের 'g' কলামে ঠিকানা
+                        l: g,      // শিটের 'l' কলামে ব্লাড গ্রুপ
+                        p: p, 
+                        last: last 
+                    }) 
+                });
+                alert("রেজিস্ট্রেশন সফল!"); location.reload();
+            } catch (e) { alert("ব্যর্থ!"); document.getElementById('rBtn').innerText = "আবার চেষ্টা করুন"; }
+        }
+
+        function showMain() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+            document.getElementById('welcome').innerText = "স্বাগতম, " + (loggedUser.n || "");
+            renderDonors(allDonors);
+        }
+
+        function filterDonors() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            renderDonors(allDonors.filter(d => d.n.toLowerCase().includes(term) || d.g.toLowerCase().includes(term) || d.l.toLowerCase().includes(term)));
+        }
+
+        function calculateStatus(dateStr) {
+            if(!dateStr || dateStr === "" || dateStr === "undefined" || dateStr === "Invalid Date") {
+                return { last: "আপনার তথ্যটি আপডেট করে নিন", next: "আপডেট প্রয়োজন ❌" };
+            }
+            const lastDate = new Date(dateStr);
+            if (isNaN(lastDate.getTime())) {
+                return { last: "আপনার তথ্যটি আপডেট করে নিন", next: "আপডেট প্রয়োজন ❌" };
+            }
+            const diffDays = Math.floor((new Date() - lastDate) / (1000 * 60 * 60 * 24));
+            const fmt = lastDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+            return diffDays >= 90 ? { last: fmt, next: "রক্ত দিতে পারবে ✅" } : { last: fmt, next: (90 - diffDays) + " দিন বাকী" };
+        }
+
+        function renderDonors(data) {
+            const list = document.getElementById('donorList'); list.innerHTML = "";
+            data.forEach((d, index) => {
+                const s = calculateStatus(d.last); const cIdx = index % 5;
+                const isMe = (loggedUser.role === 'Member' && String(d.p).slice(-10) === String(loggedUser.p).slice(-10));
+                const isAdmin = (loggedUser.role === 'Admin');
+                
+                list.innerHTML += `
+                <div class="bg-white p-5 rounded-[30px] shadow-sm border-t-[6px] card-${cIdx} relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-red-600 text-white px-4 py-1.5 rounded-bl-2xl font-black text-lg shadow-sm">${d.l}</div>
+                    
+                    <div class="flex justify-between items-start mb-1">
+                         <div class="sl-badge sl-text-${cIdx}">${String(index+1).padStart(2,'0')}</div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="info-row"><span class="info-label">নামঃ</span><span class="text-xl font-black text-gray-900 leading-tight">${d.n}</span></div>
+                        <div class="info-row"><span class="info-label text-xs">ঠিকানাঃ</span><span class="info-value text-gray-500 font-bold">${d.g}</span></div>
+                        <div class="info-row"><span class="info-label text-xs">সর্বশেষ রক্তদানঃ</span><span class="info-value text-red-custom">${s.last}</span></div>
+                        <div class="info-row"><span class="info-label text-xs">পরবর্তী রক্তদানঃ</span><span class="info-value text-red-custom font-black">${s.next}</span></div>
+                        
+                        <div class="info-row border-none pt-3">
+                            <span class="info-label text-xs">মোবাইলঃ</span>
+                            <div class="info-value flex items-center gap-3">
+                                <span class="text-blue-600 font-bold text-base">${d.p}</span>
+                                <a href="tel:${d.p}" class="bg-green-500 text-white p-2.5 rounded-full shadow-md active:scale-75 transition-transform">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    ${(isMe || isAdmin) ? `<button onclick="openEdit('${d.p}', '${d.n}')" class="mt-4 w-full bg-blue-600 text-white py-3 rounded-2xl font-bold text-xs shadow-md">তথ্য আপডেট করুন</button>` : ''}
+                </div>`;
+            });
+        }
+
+        function openEdit(p, n) { targetPhone = p; document.getElementById('editingName').innerText = n; document.getElementById('editModal').classList.remove('hidden'); }
+        function closeEdit() { document.getElementById('editModal').classList.add('hidden'); }
+        async function submitUpdate() {
+            const date = document.getElementById('newDate').value; if(!date) return;
+            document.getElementById('sBtn').innerText = "⏳...";
+            try {
+                await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update", phone: targetPhone, newDate: date }) });
+                location.reload();
+            } catch (e) { alert("ব্যর্থ!"); }
+        }
+    </script>
+</body>
+</html>
