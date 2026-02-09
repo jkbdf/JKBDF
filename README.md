@@ -30,10 +30,10 @@
 
     <div class="bg-white p-5 shadow-md text-center flex flex-col items-center mb-4 border-b-2 border-red-50">
         <div class="w-24 h-24 mb-2 p-1 bg-white rounded-full border-4 border-red-100 shadow-lg overflow-hidden flex items-center justify-center">
-            <img src="https://i.ibb.co/68XvT9T/1000001730.png" 
+            <img src="https://raw.githubusercontent.com/jkbf/JKBDF/main/1000001707.jpg" 
                  alt="Logo" 
                  class="w-full h-full object-contain"
-                 onerror="this.src='https://i.postimg.cc/8zYvTzPq/1000001707.jpg'">
+                 onerror="this.src='https://i.ibb.co/68XvT9T/1000001730.png'">
         </div>
         <h1 class="text-xl font-black text-red-600">যুব কল্যাণ রক্তদান ফাউন্ডেশন</h1>
     </div>
@@ -120,34 +120,9 @@
         <div id="donorList" class="container-custom grid gap-6"></div>
     </div>
 
-    <div id="editModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-[35px] w-full max-sm:max-w-xs text-center shadow-2xl">
-            <h3 id="editingName" class="font-bold text-gray-800 mb-4 text-lg"></h3>
-            <input type="date" id="newDate" class="w-full p-4 border rounded-2xl mb-6 text-center font-bold bg-gray-50">
-            <div class="flex gap-2">
-                <button onclick="closeEdit()" class="flex-1 bg-gray-100 py-3 rounded-2xl font-bold">বাতিল</button>
-                <button onclick="submitUpdate()" id="sBtn" class="flex-1 bg-green-600 text-white py-3 rounded-2xl font-bold">সেভ</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         const scriptURL = "https://script.google.com/macros/s/AKfycbwaIFFoE5Kzs9BoJa6JOADxdDtM-k62CgFD2phNOhQ6vat0d3a7s5w_TiXHMmfia2B3/exec"; 
-        let allDonors = [], loggedUser = null, currentRole = 'Member', targetPhone = "";
-
-        function showReg() { 
-            document.getElementById('loginPage').classList.add('hidden'); 
-            document.getElementById('regPage').classList.remove('hidden'); 
-            window.scrollTo(0,0);
-        }
-
-        function setRole(r) { 
-            currentRole = r; 
-            document.getElementById('memberFields').classList.toggle('hidden', r==='Admin'); 
-            document.getElementById('adminFields').classList.toggle('hidden', r==='Member'); 
-            document.getElementById('roleMember').classList.toggle('bg-white', r==='Member'); 
-            document.getElementById('roleAdmin').classList.toggle('bg-white', r==='Admin'); 
-        }
+        let allDonors = [], loggedUser = null, currentRole = 'Member';
 
         async function handleLogin() {
             const phone = document.getElementById('uPhone').value.trim();
@@ -169,42 +144,6 @@
             } catch (e) { err.innerText = "❌ সার্ভার এরর!"; }
         }
 
-        async function handleRegister() {
-            const n = document.getElementById('regName').value;
-            const g = document.getElementById('regGroup').value;
-            const l = document.getElementById('regLoc').value;
-            const p = document.getElementById('regPhone').value.trim();
-            const last = document.getElementById('regLast').value;
-
-            if(!n || !g || !l || !p) return alert("সব তথ্য দিন!");
-            
-            document.getElementById('rBtn').innerText = "⏳ তথ্য যাচাই হচ্ছে...";
-            document.getElementById('rBtn').disabled = true;
-
-            try {
-                const res = await fetch(scriptURL);
-                const data = await res.json();
-                const exists = data.find(d => String(d.p).slice(-10) === p.slice(-10));
-                
-                if(exists) {
-                    alert("রেজিস্ট্রেশন করা আছে আপনি সরাসরি লগইন করুন");
-                    location.reload(); 
-                    return;
-                }
-
-                await fetch(scriptURL, { 
-                    method: 'POST', 
-                    body: JSON.stringify({ action: "register", n: n, g: l, l: g, p: p, last: last }) 
-                });
-                alert("রেজিস্ট্রেশন সফল!"); 
-                location.reload();
-            } catch (e) { 
-                alert("ব্যর্থ! আবার চেষ্টা করুন।"); 
-                document.getElementById('rBtn').innerText = "রেজিস্ট্রেশন সম্পন্ন করুন";
-                document.getElementById('rBtn').disabled = false;
-            }
-        }
-
         function showMain() {
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('mainPage').classList.remove('hidden');
@@ -212,64 +151,16 @@
             renderDonors(allDonors);
         }
 
-        function filterDonors() {
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            renderDonors(allDonors.filter(d => d.n.toLowerCase().includes(term) || d.l.toLowerCase().includes(term) || d.g.toLowerCase().includes(term)));
-        }
-
-        function calculateStatus(dateStr) {
-            if(!dateStr || dateStr === "" || dateStr === "undefined" || dateStr === "Invalid Date") {
-                return { last: "তথ্য নেই", next: "রক্ত দিতে পারবে ✅" };
-            }
-            const lastDate = new Date(dateStr);
-            if (isNaN(lastDate.getTime())) return { last: "তথ্য নেই", next: "রক্ত দিতে পারবে ✅" };
-            const diffDays = Math.floor((new Date() - lastDate) / (1000 * 60 * 60 * 24));
-            const fmt = lastDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-            return diffDays >= 90 ? { last: fmt, next: "রক্ত দিতে পারবে ✅" } : { last: fmt, next: (90 - diffDays) + " দিন বাকী" };
-        }
-
         function renderDonors(data) {
             const list = document.getElementById('donorList'); list.innerHTML = "";
             data.forEach((d, index) => {
-                const s = calculateStatus(d.last); const cIdx = index % 5;
-                const isMe = (loggedUser.role === 'Member' && String(d.p).slice(-10) === String(loggedUser.p).slice(-10));
-                const isAdmin = (loggedUser.role === 'Admin');
-                
-                list.innerHTML += `
-                <div class="bg-white p-5 rounded-[30px] shadow-sm border-t-[6px] card-${cIdx} relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-red-600 text-white px-4 py-1.5 rounded-bl-2xl font-black text-lg shadow-sm">${d.l}</div>
-                    <div class="flex justify-between items-start mb-1">
-                         <div class="sl-badge sl-text-${cIdx}">${String(index+1).padStart(2,'0')}</div>
-                    </div>
-                    <div class="space-y-1">
-                        <div class="info-row"><span class="info-label">নামঃ</span><span class="text-xl font-black text-gray-900 leading-tight">${d.n}</span></div>
-                        <div class="info-row"><span class="info-label text-xs">ঠিকানাঃ</span><span class="info-value text-gray-500 font-bold">${d.g}</span></div>
-                        <div class="info-row"><span class="info-label text-xs">সর্বশেষ রক্তদানঃ</span><span class="info-value text-red-custom font-bold">${s.last}</span></div>
-                        <div class="info-row"><span class="info-label text-xs">পরবর্তী রক্তদানঃ</span><span class="info-value text-red-custom font-black">${s.next}</span></div>
-                        <div class="info-row border-none pt-3">
-                            <span class="info-label text-xs">মোবাইলঃ</span>
-                            <div class="info-value flex items-center gap-3">
-                                <span class="text-blue-600 font-bold text-base">${d.p}</span>
-                                <a href="tel:${d.p}" class="bg-green-500 text-white p-2.5 rounded-full shadow-md active:scale-75">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    ${(isMe || isAdmin) ? `<button onclick="openEdit('${d.p}', '${d.n}')" class="mt-4 w-full bg-blue-600 text-white py-3 rounded-2xl font-bold text-xs shadow-md">তথ্য আপডেট করুন</button>` : ''}
+                list.innerHTML += `<div class="bg-white p-5 rounded-[30px] shadow-sm mb-4 border-t-4 border-red-500">
+                    <p class="font-bold text-gray-800">নামঃ ${d.n}</p>
+                    <p class="text-sm text-gray-500 text-xs">গ্রুপঃ ${d.l}</p>
+                    <p class="text-sm text-gray-500 text-xs">ঠিকানাঃ ${d.g}</p>
+                    <p class="text-sm text-blue-600 font-bold">মোবাইলঃ ${d.p}</p>
                 </div>`;
             });
-        }
-
-        function openEdit(p, n) { targetPhone = p; document.getElementById('editingName').innerText = n; document.getElementById('editModal').classList.remove('hidden'); }
-        function closeEdit() { document.getElementById('editModal').classList.add('hidden'); }
-        async function submitUpdate() {
-            const date = document.getElementById('newDate').value; if(!date) return;
-            document.getElementById('sBtn').innerText = "⏳...";
-            try {
-                await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update", phone: targetPhone, newDate: date }) });
-                location.reload();
-            } catch (e) { alert("ব্যর্থ!"); }
         }
     </script>
 </body>
