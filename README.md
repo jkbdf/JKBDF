@@ -30,10 +30,10 @@
 
     <div class="bg-white p-5 shadow-md text-center flex flex-col items-center mb-4 border-b-2 border-red-50">
         <div class="w-24 h-24 mb-2 p-1 bg-white rounded-full border-4 border-red-100 shadow-lg overflow-hidden flex items-center justify-center">
-            <img src="https://raw.githubusercontent.com/jkbf/JKBDF/main/1000001707.jpg" 
+            <img src="https://i.ibb.co/68XvT9T/1000001730.png" 
                  alt="Logo" 
                  class="w-full h-full object-contain"
-                 onerror="this.onerror=null; this.src='https://i.postimg.cc/8zYvTzPq/1000001707.jpg';">
+                 onerror="this.src='https://i.postimg.cc/8zYvTzPq/1000001707.jpg'">
         </div>
         <h1 class="text-xl font-black text-red-600">যুব কল্যাণ রক্তদান ফাউন্ডেশন</h1>
     </div>
