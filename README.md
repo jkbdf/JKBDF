@@ -132,7 +132,7 @@
     </div>
 
     <script>
-        const scriptURL = "https://script.google.com/macros/s/AKfycbwaIFFoE5Kzs9BoJa6JOADxdDtM-k62CgFD2phNOhQ6vat0d3a7s5w_TiXHMmfia2B3/exec";
+        const scriptURL = "https://script.google.com/macros/s/AKfycbyfFodBqkhF6QEsw4s0zn-HzGUTfrn_f2xd4ndcp-yp1_cjI5Zo0okFLiI1CL7wjnnZ/exec";
         let allDonors = [], loggedUser = null, currentRole = 'Member', targetPhone = "";
 
         function showReg() { 
