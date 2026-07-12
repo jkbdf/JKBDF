@@ -234,6 +234,14 @@ const galleryURL = "https://script.google.com/macros/s/AKfycbz5AVm--NNdDx3Vvr7e0
             document.getElementById('mainPage').classList.remove('hidden');
             document.getElementById('welcome').innerText = "স্বাগতম, " + (loggedUser.n || "");
             renderDonors(allDonors);
+            function showMain() {
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('mainPage').classList.remove('hidden');
+    document.getElementById('welcome').innerText = "স্বাগতম, " + (loggedUser.n || "");
+
+    renderDonors(allDonors);
+    loadGallery();
+            }
         }
 
         function filterDonors() {
