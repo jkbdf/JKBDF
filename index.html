@@ -102,11 +102,7 @@
             <button onclick="location.reload()" class="w-full text-gray-500 mt-4 text-sm font-bold">ফিরে যান</button>
         </div>
     </div>
-<div class="container-custom mb-6">
-    <h2 class="text-xl font-black text-red-600 mb-3 text-center">📷 ছবির গ্যালারি</h2>
 
-    <div id="gallery" class="grid grid-cols-2 gap-3"></div>
-</div>
     <div id="mainPage" class="hidden">
         <div class="hero-gradient text-white p-8 rounded-b-[40px] text-center relative mb-6 shadow-xl border-b-4 border-red-700">
             <button onclick="location.reload()" class="absolute top-4 right-4 text-[11px] bg-white/20 px-3 py-1 rounded-full border border-white/30 font-bold">লগ আউট</button>
@@ -133,27 +129,6 @@
     </div>
 
     <script>
-        async function loadGallery() {
-    try {
-        const res = await fetch(galleryURL);
-        const images = await res.json();
-
-        const gallery = document.getElementById("gallery");
-        gallery.innerHTML = "";
-
-        images.forEach(img => {
-            gallery.innerHTML += `
-                <img src="${img.url}"
-     class="w-full h-40 object-cover rounded-xl shadow"
-     onclick="window.open('${img.url}','_blank')">
-            `;
-        });
-
-    } catch (e) {
-        document.getElementById("gallery").innerHTML =
-            "<p class='text-center text-red-600'>গ্যালারি লোড করা যায়নি</p>";
-    }
-        }
         const scriptURL = "https://script.google.com/macros/s/AKfycbyfFodBqkhF6QEsw4s0zn-HzGUTfrn_f2xd4ndcp-yp1_cjI5Zo0okFLiI1CL7wjnnZ/exec";
 const galleryURL = "https://script.google.com/macros/s/AKfycbz5AVm--NNdDx3Vvr7e0-zz8HOZR9HEL83phBhXoT5sca2_YrKGpOFvfq5bNGpQPNud/exec";
         let allDonors = [], loggedUser = null, currentRole = 'Member', targetPhone = "";
@@ -182,7 +157,6 @@ const galleryURL = "https://script.google.com/macros/s/AKfycbz5AVm--NNdDx3Vvr7e0
                 if(currentRole === 'Admin' && pass === 'Mehedi4739') { 
                     loggedUser = { n: "এডমিন", role: "Admin" }; 
                     showMain(); 
-                    loadGallery();
                 } else {
                     const user = allDonors.find(d => String(d.p).slice(-10) === phone.slice(-10));
                     if(user) { 
@@ -234,14 +208,6 @@ const galleryURL = "https://script.google.com/macros/s/AKfycbz5AVm--NNdDx3Vvr7e0
             document.getElementById('mainPage').classList.remove('hidden');
             document.getElementById('welcome').innerText = "স্বাগতম, " + (loggedUser.n || "");
             renderDonors(allDonors);
-            function showMain() {
-    document.getElementById('loginPage').classList.add('hidden');
-    document.getElementById('mainPage').classList.remove('hidden');
-    document.getElementById('welcome').innerText = "স্বাগতম, " + (loggedUser.n || "");
-
-    renderDonors(allDonors);
-    loadGallery();
-            }
         }
 
         function filterDonors() {
