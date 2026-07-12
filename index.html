@@ -143,9 +143,9 @@
 
         images.forEach(img => {
             gallery.innerHTML += `
-                <img src="${img.image}"
-                     class="w-full h-40 object-cover rounded-xl shadow cursor-pointer"
-                     onclick="window.open('${img.image}','_blank')">
+                <img src="${img.url}"
+     class="w-full h-40 object-cover rounded-xl shadow"
+     onclick="window.open('${img.url}','_blank')">
             `;
         });
 
